@@ -1,0 +1,26 @@
+name: Deploy to Azure VM
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up SSH key
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.VM_SSH_KEY }}
+
+      - name: Deploy and run ETL on Azure VM
+        run: |
+          ssh -o StrictHostKeyChecking=no azureuser@20.255.56.230 '
+            cd Enterprise-Data-Integration-Platform && 
+            git pull && 
+            pip3 install -r requirements.txt && 
+            python3 main.py
+          '
